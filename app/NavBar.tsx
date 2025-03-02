@@ -1,18 +1,31 @@
-import React from 'react'
+import Link from 'next/link';
+import React from 'react';
 
 const NavBar = () => {
-  return (
-    <div className="navbar bg-base-100 shadow-sm">
-  <div className="flex-1">
-    <a className="btn btn-ghost text-xl">daisyUI</a>
-  </div>
-  <div className="flex-none">
-    <button className="btn btn-square btn-ghost">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path> </svg>
-    </button>
-  </div>
-</div>
-  )
-}
+    const links = [
+        { label: 'Dashboard', href: '/' },
+        { label: 'Issues', href: '/issues' },
+        { label: 'About', href: '/about' },
+    ];
 
-export default NavBar
+    return (
+        <div className="navbar bg-base-100 shadow-sm">
+            <div className="flex-1">
+                <a className="btn btn-ghost text-xl">Issue Tracker</a>
+            </div>
+            <div className="flex-none">
+                <ul className="menu menu-horizontal px-1">
+                    {links.map((link) => (
+                        <li key={link.href}>
+                            <Link href={link.href} className="text-zinc-500 hover:text-zinc-900 transition-colors">
+                                {link.label}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+};
+
+export default NavBar;

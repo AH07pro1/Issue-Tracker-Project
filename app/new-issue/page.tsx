@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { redirect } from  'next/navigation'
 
 const createIssueSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title cannot be longer than 255 characters'),
@@ -45,6 +46,7 @@ const NewIssue = () => {
         } finally {
             setIsLoading(false);
             alert('Issue submitted successfully!');
+            redirect('/issues');
         }
     };
 

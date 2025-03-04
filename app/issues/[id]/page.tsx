@@ -1,5 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // for redirecting after deletion
+import Modal from '@/app/Modal';
 
 interface Props {
     params: Promise<{ id: number }>;
@@ -12,6 +14,8 @@ const IssueDetails = ({ params }: Props) => {
     const [unwrappedParams, setUnwrappedParams] = useState<{ id: number } | null>(null);
     const [editingField, setEditingField] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Modal open state
+    const router = useRouter(); // Used for redirecting after deletion
 
     useEffect(() => {
         const unwrapParams = async () => {
@@ -42,11 +46,11 @@ const IssueDetails = ({ params }: Props) => {
 
     const handleSave = async (field: string) => {
         if (!specificIssue) return;
-    
+
         const updatedIssue = { ...specificIssue, [field]: editedValue };
         setSpecificIssue(updatedIssue);
         setEditingField(null);
-    
+
         await fetch(`/api/issues/${specificIssue.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -57,6 +61,21 @@ const IssueDetails = ({ params }: Props) => {
             }),
         });
     };
+
+    const handleDelete = async () => {
+        if (!specificIssue) return;
+
+        // Send DELETE request to backend to remove the issue
+        await fetch(`/api/issues/${specificIssue.id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        router.push('/issues'); // Redirect after deletion
+    };
+
+    const openModal = () => setIsModalOpen(true); // Open modal function
+    const closeModal = () => setIsModalOpen(false); // Close modal function
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-base-100 shadow-lg rounded-lg">
@@ -117,9 +136,21 @@ const IssueDetails = ({ params }: Props) => {
                             </tr>
                         </tbody>
                     </table>
+
+                    {/* Delete Button */}
+                    <div className="mt-4 text-center">
+                        <button className="btn btn-error" onClick={openModal}>
+                            Delete Issue
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <p className="text-center text-gray-500">Loading...</p>
+            )}
+
+            {/* Modal for Confirmation */}
+            {isModalOpen && (
+               <Modal confirmationMessage='Are you sure you want to delete this issue?' warningMessage='This action cannot be undone.' cancelAction={closeModal} deleteAction={handleDelete}/>
             )}
         </div>
     );

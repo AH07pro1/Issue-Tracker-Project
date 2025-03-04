@@ -38,3 +38,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
     return NextResponse.json({updatedIssue}, {status: 201});
   }
+
+
+  export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    // Perform the delete operation using the Prisma client
+    const deletedIssue = await prisma.issue.delete({
+        where: { id: parseInt(params.id) },
+    });
+
+    // Return a response indicating the issue was successfully deleted
+    return NextResponse.json({ message: "Issue deleted successfully", deletedIssue }, { status: 200 });
+}
+

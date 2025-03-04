@@ -7,46 +7,102 @@ interface Props {
 
 const IssueDetails = ({ params }: Props) => {
     const [specificIssue, setSpecificIssue] = useState<any>(null);
-    const [resolvedParams, setResolvedParams] = useState<{ id: number } | null>(null);
+    const [unwrappedParams, setUnwrappedParams] = useState<{ id: number } | null>(null);
+    const [editingField, setEditingField] = useState<string | null>(null);
+    const [editedValue, setEditedValue] = useState<string>('');
+    
 
     useEffect(() => {
         const unwrapParams = async () => {
-            const resolved = await params;
-            setResolvedParams(resolved);
+            const resolvedParams = await params;
+            setUnwrappedParams(resolvedParams);
         };
         unwrapParams();
     }, [params]);
 
     useEffect(() => {
-        if (resolvedParams) {
+        if (unwrappedParams) {
             const getSpecificIssue = async () => {
-                const response = await fetch(`/api/issues/${resolvedParams.id}`, {
+                const response = await fetch(`http://localhost:3000/api/issues/${unwrappedParams.id}`, {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                 });
                 const data = await response.json();
                 setSpecificIssue(data);
             };
             getSpecificIssue();
         }
-    }, [resolvedParams]);
+    }, [unwrappedParams]);
+
+    const handleEdit = (field: string, value: string) => {
+        setEditingField(field);
+        setEditedValue(value);
+    };
+
+    const handleSave = async (field: string) => {
+        if (!specificIssue) return;
+    
+        const updatedIssue = { ...specificIssue, [field]: editedValue };
+        setSpecificIssue(updatedIssue);
+        setEditingField(null);
+    
+        await fetch(`/api/issues/${specificIssue.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: field === "title" ? editedValue : specificIssue.title,
+                status: field === "status" ? editedValue : specificIssue.status,
+                description: field === "description" ? editedValue : specificIssue.description
+            }),
+        });
+    };
+    
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-base-100 shadow-lg rounded-lg">
-            <h1 className="text-3xl font-bold text-primary mb-6">Issue Details</h1>
+        <div className="max-w-3xl mx-auto p-6 bg-base-100 shadow-lg rounded-lg">
+            <h1 className="text-3xl font-bold text-primary mb-6 text-center">Issue Details</h1>
+
             {specificIssue ? (
-                <div className="space-y-4">
-                    <div className="bg-base-200 p-4 rounded-lg">
-                        <h2 className="text-xl font-bold">ID: {specificIssue.id}</h2>
-                        <div className='mt-5'>
-                        <p className="text-gray-600">Title: {specificIssue.title}</p>
-                        <p className="text-gray-600">Description: {specificIssue.description}</p>
-                        <p className="text-gray-600">Created At: {new Date(specificIssue.createdAt).toLocaleString()}</p>
-                        </div>
-                        
-                    </div>
+                <div className="bg-base-200 p-6 rounded-lg">
+                    <table className="table-auto w-full">
+                        <tbody>
+                            {['title', 'status', 'description'].map((field) => (
+                                <tr key={field} className="border-b border-gray-300">
+                                    <td className="font-bold p-3 capitalize">{field}:</td>
+                                    <td className="p-3">
+                                        {editingField === field ? (
+                                            <input
+                                                type="text"
+                                                className="input input-bordered w-full"
+                                                value={editedValue}
+                                                onChange={(e) => setEditedValue(e.target.value)}
+                                            />
+                                        ) : (
+                                            specificIssue[field]
+                                        )}
+                                    </td>
+                                    <td className="p-3">
+                                        {editingField === field ? (
+                                            <button className="btn btn-success btn-sm" onClick={() => handleSave(field)}>
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="btn btn-primary btn-sm" onClick={() => handleEdit(field, specificIssue[field])}>
+                                                Edit
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            <tr>
+                                <td className="font-bold p-3">Created At:</td>
+                                <td className="p-3">{new Date(specificIssue.createdAt).toLocaleString()}</td>
+                                <td className="p-3">
+                                    <button className="btn btn-primary btn-sm" disabled>Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             ) : (
                 <p className="text-center text-gray-500">Loading...</p>

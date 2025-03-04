@@ -5,12 +5,13 @@ interface Props {
     params: Promise<{ id: number }>;
 }
 
+const statusOptions = ['OPEN', 'CLOSED', 'IN_PROGRESS']; // Enum values
+
 const IssueDetails = ({ params }: Props) => {
     const [specificIssue, setSpecificIssue] = useState<any>(null);
     const [unwrappedParams, setUnwrappedParams] = useState<{ id: number } | null>(null);
     const [editingField, setEditingField] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
-    
 
     useEffect(() => {
         const unwrapParams = async () => {
@@ -51,12 +52,11 @@ const IssueDetails = ({ params }: Props) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 title: field === "title" ? editedValue : specificIssue.title,
-                status: field === "status" ? editedValue : specificIssue.status,
+                status: field === "status" ? editedValue as "OPEN" | "IN_PROGRESS" | "CLOSED" : specificIssue.status,
                 description: field === "description" ? editedValue : specificIssue.description
             }),
         });
     };
-    
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-base-100 shadow-lg rounded-lg">
@@ -71,12 +71,26 @@ const IssueDetails = ({ params }: Props) => {
                                     <td className="font-bold p-3 capitalize">{field}:</td>
                                     <td className="p-3">
                                         {editingField === field ? (
-                                            <input
-                                                type="text"
-                                                className="input input-bordered w-full"
-                                                value={editedValue}
-                                                onChange={(e) => setEditedValue(e.target.value)}
-                                            />
+                                            field === 'status' ? (
+                                                <select
+                                                    className="select select-bordered w-full"
+                                                    value={editedValue}
+                                                    onChange={(e) => setEditedValue(e.target.value)}
+                                                >
+                                                    {statusOptions.map((option) => (
+                                                        <option key={option} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    className="input input-bordered w-full"
+                                                    value={editedValue}
+                                                    onChange={(e) => setEditedValue(e.target.value)}
+                                                />
+                                            )
                                         ) : (
                                             specificIssue[field]
                                         )}

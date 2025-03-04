@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { redirect } from  'next/navigation'
+import { redirect } from 'next/navigation';
 
+// Updated schema to include "status"
 const createIssueSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title cannot be longer than 255 characters'),
     description: z.string().min(1, 'Description is required'),
+    status: z.enum(['OPEN', 'IN_PROGRESS', 'CLOSED'], { message: 'Invalid status' }), // Added status
 });
 
 const NewIssue = () => {
@@ -20,6 +22,7 @@ const NewIssue = () => {
         reset,
     } = useForm({
         resolver: zodResolver(createIssueSchema),
+        defaultValues: { status: 'OPEN' }, // Default status is "OPEN"
     });
 
     const handleCleanUp = () => {
@@ -69,6 +72,17 @@ const NewIssue = () => {
                     {...register('description')}
                 />
                 {errors.description && <span className="text-error text-sm">{errors.description.message}</span>}
+
+                {/* Dropdown for status */}
+                <select 
+                    className={`select select-bordered w-full ${errors.status ? 'select-error' : ''}`}
+                    {...register('status')}
+                >
+                    <option value="OPEN">OPEN</option>
+                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                    <option value="CLOSED">CLOSED</option>
+                </select>
+                {errors.status && <span className="text-error text-sm">{errors.status.message}</span>}
 
                 <button 
                     type="submit" 

@@ -1,13 +1,13 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
 
 interface User {
-    id: number;
+    id: string;  // changed to string as userId in Prisma is a string (it should match the type in your schema)
     name: string;
 }
 
 interface AssigneeDropdownProps {
-    onSelectUser: (userId: string | null) => void;
+    onSelectUser: (userId: string | null) => void;  // callback function to pass the userId to the parent
 }
 
 function AssigneeDropdown({ onSelectUser }: AssigneeDropdownProps) {
@@ -15,6 +15,7 @@ function AssigneeDropdown({ onSelectUser }: AssigneeDropdownProps) {
     const [selectedUser, setSelectedUser] = useState<string>("");
 
     useEffect(() => {
+        // Fetch users from your backend API
         fetch('/api/users')
             .then(response => response.json())
             .then(data => setUsers(data))
@@ -23,8 +24,8 @@ function AssigneeDropdown({ onSelectUser }: AssigneeDropdownProps) {
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const userId = e.target.value ? String(e.target.value) : null;
-        setSelectedUser(e.target.value);
-        onSelectUser(userId); // Pass selected user ID to parent
+        setSelectedUser(userId || ""); // Update the selected user state
+        onSelectUser(userId); // Pass the selected user ID to the parent
     };
 
     return (

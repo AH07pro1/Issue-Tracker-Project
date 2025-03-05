@@ -33,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         title: body.title,
         status: body.status,
         description: body.description,
-        
+        assignedToUserId: body.assignedToUserId
       }
     });
     return NextResponse.json({updatedIssue}, {status: 201});

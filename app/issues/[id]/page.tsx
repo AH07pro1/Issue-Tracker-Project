@@ -3,6 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/Modal';
 import AssigneeDropdown from '../../assigneeDropdown';
+import { boolean } from 'zod';
 
 interface Props {
     params: Promise<{ id: number }>; // `params` is now a Promise
@@ -22,6 +23,7 @@ const IssueDetails = ({ params }: Props) => {
     const [editedValue, setEditedValue] = useState<string>(''); // The user ID or value being edited
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [assignedUserId, setAssignedUserId] = useState<string | null>(null); // Track the selected user ID
+    const [isFetchingAssignedUser, setIsFetchingAssignedUser] = useState(false);
     const router = useRouter();
   
     useEffect(() => {
@@ -51,7 +53,8 @@ const IssueDetails = ({ params }: Props) => {
     useEffect(() => {
       const getAssignedToUser = async () => {
         if (!specificIssue || !specificIssue.assignedToUserId) return;
-  
+        
+        setIsFetchingAssignedUser(true);
         try {
             console.log('Assigned to user:', assignedToUser);
           const response = await fetch(`/api/users/${specificIssue.assignedToUserId}`, {
@@ -68,6 +71,9 @@ const IssueDetails = ({ params }: Props) => {
         } catch (error) {
           console.error('Error fetching assigned user:', error);
         }
+        finally{
+            setIsFetchingAssignedUser(false);
+        }
       };
   
       getAssignedToUser();
@@ -79,6 +85,7 @@ const IssueDetails = ({ params }: Props) => {
     };
   
     const updateAssignee = async (userId: string | null) => {
+        setIsFetchingAssignedUser(true);
         try {
             console.log(`/api/issues/${specificIssue.id}`);
             console.log("assigned user id", assignedUserId)
@@ -95,8 +102,27 @@ const IssueDetails = ({ params }: Props) => {
                 }),
             });
 
+            if (userId) {
+                const response = await fetch(`/api/users/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to fetch assigned user');
+                }
+    
+                const userData = await response.json();
+                setAssignedToUser(userData); // Update the UI with the new assigned user
+            } else {
+                setAssignedToUser(null); // If unassigned, reset the state
+            }
+
         } catch (error) {
             console.error('Error updating assignee:', error);
+        }
+        finally{
+            setIsFetchingAssignedUser(false);
         }
     };
 
@@ -178,7 +204,11 @@ const IssueDetails = ({ params }: Props) => {
                           />
                         )
                       ) : field === 'assignedTo' ? (
-                        <h1>{assignedToUser ? assignedToUser.name : 'Unassigned'}</h1>
+                        isFetchingAssignedUser ? (
+                          <p>Loading...</p>
+                        ) : (
+                          assignedToUser && <h1>{assignedToUser ? assignedToUser.name : 'Unassigned'}</h1>
+                        )
                       ) : (
                         specificIssue[field]
                       )}

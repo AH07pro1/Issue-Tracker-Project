@@ -4,16 +4,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
+import SelectStatusDropdown from './selectStatusDropdown';
+import AssigneeDropdown from '../assigneeDropdown';
 
-// Updated schema to include "status"
 const createIssueSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title cannot be longer than 255 characters'),
     description: z.string().min(1, 'Description is required'),
-    status: z.enum(['OPEN', 'IN_PROGRESS', 'CLOSED'], { message: 'Invalid status' }), // Added status
+    status: z.enum(['OPEN', 'IN_PROGRESS', 'CLOSED'], { message: 'Invalid status' }),
+    assignedToUserId: z.number().nullable().optional(), // Allow null if no assignee selected
 });
 
 const NewIssue = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [assignedToUserId, setAssignedToUserId] = useState<string | null>(null); // Store selected user ID
 
     const {
         register,
@@ -22,25 +25,28 @@ const NewIssue = () => {
         reset,
     } = useForm({
         resolver: zodResolver(createIssueSchema),
-        defaultValues: { status: 'OPEN' }, // Default status is "OPEN"
+        defaultValues: { status: 'OPEN' },
     });
 
     const handleCleanUp = () => {
         reset();
+        setAssignedToUserId(null);
     };
 
     const onSubmit = async (data: any) => {
         console.log("Submitting issue:", data);
         setIsLoading(true);
 
+        const requestData = { ...data, assignedToUserId };
+        console.log("requestedData", requestData);
+
         try {
             const response = await fetch('/api/issues', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData),
             });
+
             const result = await response.json();
             console.log(result);
             handleCleanUp();
@@ -74,15 +80,11 @@ const NewIssue = () => {
                 {errors.description && <span className="text-error text-sm">{errors.description.message}</span>}
 
                 {/* Dropdown for status */}
-                <select 
-                    className={`select select-bordered w-full ${errors.status ? 'select-error' : ''}`}
-                    {...register('status')}
-                >
-                    <option value="OPEN">OPEN</option>
-                    <option value="IN_PROGRESS">IN_PROGRESS</option>
-                    <option value="CLOSED">CLOSED</option>
-                </select>
+                <SelectStatusDropdown errors={errors} register={register} />
                 {errors.status && <span className="text-error text-sm">{errors.status.message}</span>}
+
+                {/* Assignee dropdown */}
+                <AssigneeDropdown onSelectUser={setAssignedToUserId} />
 
                 <button 
                     type="submit" 

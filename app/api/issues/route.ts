@@ -29,7 +29,9 @@ export async function POST(request: NextRequest){
     data: {
       title: body.title,
       description: body.description,
-      status: body.status
+      status: body.status,
+      assignedToUserId: body.assignedToUserId,
+      assignedToUser: body.assignedToUser
     }
   });
   return NextResponse.json({issue}, {status: 201});

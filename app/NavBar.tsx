@@ -18,8 +18,10 @@ const NavBar = () => {
     return (
         <div className="navbar bg-base-100 shadow-sm">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl">Issue Tracker</a>
+                {/* Bug Hunter title with responsive font size */}
+                <a className="btn btn-ghost text-xl sm:text-2xl lg:text-3xl font-bold">Bug Hunter</a>
             </div>
+
             <div className="flex-none ml-auto flex items-center space-x-4">
                 <ul className="menu menu-horizontal px-1 inline-flex space-x-4">
                     {links.map((link) => (
@@ -37,20 +39,19 @@ const NavBar = () => {
                 <div className="flex items-center space-x-4">
                     {status === 'authenticated' ? (
                         <div className="flex items-center space-x-2">
-                            {/* Profile Picture */}
+                            {/* Profile Picture with Outline */}
                             {session.user?.image && (
-                                <div className="avatar w-8 h-8  rounded-full">
+                                <div className="avatar w-8 h-8 rounded-full border-2 border-zinc-500 hover:border-zinc-800 cursor-pointer">
                                     <img
-                                        src={session.user!.image!} 
+                                        src={session.user!.image!}
                                         onClick={() => redirect('/profile')}
-                                        alt="Profile Picture" 
-                                        width={40} 
+                                        alt="Profile Picture"
+                                        width={40}
                                         height={40}
-                                        className="rounded-full" 
+                                        className="rounded-full"
                                     />
                                 </div>
                             )}
-                            
                         </div>
                     ) : (
                         <Link href="/api/auth/signin" className="btn btn-primary">

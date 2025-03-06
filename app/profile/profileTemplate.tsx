@@ -10,8 +10,8 @@ interface Props {
 
 function ProfileTemplate({ name, email, profilePic }: Props) {
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-xl w-full sm:w-96">
+        <div className="min-h-screen bg-base-200 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-xl shadow-2xl w-full sm:w-96">
                 <div className="text-center">
                     {/* Profile Picture */}
                     <div className="mb-6">

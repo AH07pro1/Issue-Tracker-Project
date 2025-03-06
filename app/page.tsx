@@ -1,10 +1,17 @@
-import Image from "next/image";
-import NavBar from "./NavBar";
+// app/page.tsx
+'use client';
 
-export default function Home() {
-  return (
-    <div> 
-      Hello people
-    </div>
-  );
-}
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+const HomePage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/dashboard');
+  }, [router]);
+
+  return null; 
+};
+
+export default HomePage;

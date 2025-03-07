@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation';
 import SelectStatusDropdown from './selectStatusDropdown';
 import AssigneeDropdown from '../assigneeDropdown';
 import { useAppContext } from '@/context';
+import { useSession } from 'next-auth/react';
+import IssueForm from './IssueForm';
 
 const createIssueSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title cannot be longer than 255 characters'),
@@ -18,7 +20,14 @@ const createIssueSchema = z.object({
 const NewIssue = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [assignedToUserId, setAssignedToUserId] = useState<string | null>(null); // Store selected user ID
+    const { status, data: session } = useSession();
 
+     useEffect(() => {
+        if (!session) {
+          redirect('/api/auth/signin');
+        } 
+      }, [session]);
+  
     const {
         register,
         handleSubmit,
@@ -38,14 +47,21 @@ const NewIssue = () => {
         console.log("Submitting issue:", data);
         setIsLoading(true);
 
-        const requestData = { ...data, assignedToUserId };
+        const requestData = { ...data, assignedToUserId, createdByUserId: session?.user.id, createdByUserName: session?.user.name};
         console.log("requestedData", requestData);
 
         try {
             const response = await fetch('/api/issues', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestData),
+                body: JSON.stringify({
+                    'title':requestData.title,
+                    'description': requestData.description,
+                    'status': requestData.status,
+                    'createdByUserId': requestData.createdByUserId,
+                    'assignedToUserId': requestData.assignedToUserId,
+                    'createdByUserName': requestData.createdByUserName
+                }),
             });
 
             const result = await response.json();
@@ -61,45 +77,14 @@ const NewIssue = () => {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-base-100 shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-6 text-primary">New Issue</h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4">
-                <input 
-                    type="text" 
-                    placeholder="Issue title" 
-                    className={`input input-bordered w-full ${errors.title ? 'input-error' : ''}`}
-                    {...register('title')}
-                />
-                {errors.title && <span className="text-error text-sm">{errors.title.message}</span>}
-
-                <textarea 
-                    placeholder="Issue description" 
-                    rows={3} 
-                    className={`textarea textarea-bordered w-full ${errors.description ? 'textarea-error' : ''}`}
-                    {...register('description')}
-                />
-                {errors.description && <span className="text-error text-sm">{errors.description.message}</span>}
-
-                {/* Dropdown for status */}
-                <SelectStatusDropdown errors={errors} register={register} />
-                {errors.status && <span className="text-error text-sm">{errors.status.message}</span>}
-
-                {/* Assignee dropdown */}
-                <AssigneeDropdown onSelectUser={setAssignedToUserId} />
-
-                <button 
-                    type="submit" 
-                    className="btn btn-primary"
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <span className="loading loading-spinner loading-sm"></span>
-                    ) : (
-                        'Submit Issue'
-                    )}
-                </button>
-            </form>
-        </div>
+        <IssueForm 
+        register={register}
+        errors={errors}
+        isLoading={isLoading}
+        onSubmit={handleSubmit(onSubmit)}
+        assignedToUserId={assignedToUserId}
+        setAssignedToUserId={setAssignedToUserId}
+      />
     );
 };
 

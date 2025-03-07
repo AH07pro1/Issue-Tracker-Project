@@ -1,8 +1,9 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useAppContext } from '@/context';
 import { redirect } from 'next/navigation';
-import StatusBadge from './statusBadge';
+import IssueTable from './issueTable';
 
 interface Issue {
   id: number;
@@ -10,34 +11,60 @@ interface Issue {
   status: string;
   createdAt: string;
   description: string;
+  createdByUserId: string;
+  createdByUserName: string;
+  assignedToUserId: string | null;
 }
 
 const IssuePage = () => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filteredStatus, setFilteredStatus] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<'all' | 'created' | 'assigned'>('all');
   const { setIssueCounts } = useAppContext();
+  const { data: session } = useSession();
 
   useEffect(() => {
-    getAllIssues();
-  }, [sortOrder, filteredStatus]); // Fetch when sort order or filter changes
+    if (!session) {
+      redirect('/api/auth/signin');
+    } else {
+      getUserIssues();
+    }
+  }, [session, sortOrder, filteredStatus, filterType]);
 
-  const getAllIssues = async () => {
+  const getCurrentFilter = () => {
+    return `${filterType === 'all' ? 'All' : filterType === 'created' ? 'Created by Me' : 'Assigned to Me'}${filteredStatus ? ` (${filteredStatus})` : ''}`;
+  };
+
+  const getUserIssues = async () => {
     try {
       const response = await fetch('/api/issues');
       let data: Issue[] = await response.json();
 
-      // Count issues by status
-      const openCount = data.filter(issue => issue.status === 'OPEN').length;
-      const closedCount = data.filter(issue => issue.status === 'CLOSED').length;
-      const inProgressCount = data.filter(issue => issue.status === 'IN_PROGRESS').length;
+      if (!session?.user?.id) return;
 
-      // Update context with issue counts
+      // Default: Show issues created by or assigned to the user
+      data = data.filter(
+        (issue) =>
+          issue.createdByUserId === session.user.id || issue.assignedToUserId === session.user.id
+      );
+
+      // Apply filtering for "Created by Me" or "Assigned to Me"
+      if (filterType === 'created') {
+        data = data.filter((issue) => issue.createdByUserId === session.user.id);
+      } else if (filterType === 'assigned') {
+        data = data.filter((issue) => issue.assignedToUserId === session.user.id);
+      }
+
+      // Count issues by status
+      const openCount = data.filter((issue) => issue.status === 'OPEN').length;
+      const closedCount = data.filter((issue) => issue.status === 'CLOSED').length;
+      const inProgressCount = data.filter((issue) => issue.status === 'IN_PROGRESS').length;
       setIssueCounts({ open: openCount, closed: closedCount, inProgress: inProgressCount });
 
-      // Apply status filter
+      // Apply status filter if selected
       if (filteredStatus) {
-        data = data.filter(issue => issue.status === filteredStatus);
+        data = data.filter((issue) => issue.status === filteredStatus);
       }
 
       // Sort issues
@@ -47,7 +74,6 @@ const IssuePage = () => {
           : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      // Update state only once to avoid unnecessary re-renders
       setIssues(data);
     } catch (error) {
       console.error('Error fetching issues:', error);
@@ -55,49 +81,16 @@ const IssuePage = () => {
   };
 
   return (
-    <div className="overflow-x-auto">
-      {/* Filter Buttons */}
-      <div className="flex space-x-4 mb-4">
-        <button className={`btn ${filteredStatus === null ? 'btn-primary' : ''}`} onClick={() => setFilteredStatus(null)}>
-          All
-        </button>
-        <button className={`btn ${filteredStatus === 'OPEN' ? 'btn-primary' : ''}`} onClick={() => setFilteredStatus('OPEN')}>
-          Open
-        </button>
-        <button className={`btn ${filteredStatus === 'IN_PROGRESS' ? 'btn-primary' : ''}`} onClick={() => setFilteredStatus('IN_PROGRESS')}>
-          In Progress
-        </button>
-        <button className={`btn ${filteredStatus === 'CLOSED' ? 'btn-primary' : ''}`} onClick={() => setFilteredStatus('CLOSED')}>
-          Closed
-        </button>
-      </div>
-
-      {/* Table */}
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th className="cursor-pointer hover:text-primary" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} >
-              Created At {sortOrder === 'asc' ? '↑' : '↓'}
-            </th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {issues.map(issue => (
-            <tr key={issue.id} onClick={() => redirect(`/issues/${issue.id}`)} className="hover:bg-base-300">
-              <td>{issue.id}</td>
-              <td>{issue.title}</td>
-              <td><StatusBadge status={issue.status} /></td>
-              <td>{new Date(issue.createdAt).toLocaleString()}</td>
-              <td>{issue.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      <IssueTable
+        filterType={filterType}
+        filteredStatus={filteredStatus}
+        setFilterType={setFilterType}
+        setFilteredStatus={setFilteredStatus}
+        issues={issues}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        getCurrentFilter={getCurrentFilter}
+      />
   );
 };
 

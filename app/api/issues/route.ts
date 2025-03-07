@@ -10,8 +10,6 @@ export async function GET(request: NextRequest){
 }
 
 
-
-
 export async function POST(request: NextRequest){
   const body = await request.json();
 
@@ -31,7 +29,11 @@ export async function POST(request: NextRequest){
       description: body.description,
       status: body.status,
       assignedToUserId: body.assignedToUserId,
-      assignedToUser: body.assignedToUser
+      assignedToUser: body.assignedToUser,
+      createdByUserId: body.createdByUserId,
+      createdByUserName: body.createdByUserName,
+      createdByUser: body.createdbyUser,
+      
     }
   });
   return NextResponse.json({issue}, {status: 201});

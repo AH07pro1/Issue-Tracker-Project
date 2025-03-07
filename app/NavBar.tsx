@@ -45,7 +45,7 @@ const NavBar = () => {
                                     <img
                                         src={session.user!.image!}
                                         onClick={() => redirect('/profile')}
-                                        alt="Profile Picture"
+                                        alt="PFP"
                                         width={40}
                                         height={40}
                                         className="rounded-full"

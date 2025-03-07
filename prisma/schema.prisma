@@ -49,6 +49,12 @@ model User {
 
   createdIssues Issue[]   @relation("CreatedIssues") 
   assignedIssues Issue[]  @relation("AssignedIssues")
+  role      Role     @default(USER) 
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Account {

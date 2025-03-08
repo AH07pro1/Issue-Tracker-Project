@@ -1,9 +1,10 @@
-import NextAuth, { AuthOptions} from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 
+// Initialize Prisma client
 const prisma = new PrismaClient();
 
 export const authOptions: AuthOptions = {
@@ -19,12 +20,11 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    // Type the session and user parameters here
+    // Type the session and user parameters here using the custom type from next-auth.d.ts
     async session({ session, user }) {
-      // Check if user exists and add user role
       if (user) {
         session.user.id = user.id;
-        session.user.role = (user as any).role || "user"; // Typecasting user to ensure role exists
+        session.user.role = ((user as unknown) as { role: string }).role || "user"; // Ensure role exists
       }
       return session;
     },
@@ -34,5 +34,5 @@ export const authOptions: AuthOptions = {
   },
 };
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST}
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

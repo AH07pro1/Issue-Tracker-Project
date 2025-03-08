@@ -12,6 +12,7 @@ interface User {
     name: string;
 }
 
+
 const statusOptions = ['OPEN', 'CLOSED', 'IN_PROGRESS'];
 
 const IssueDetails = ({ params }: Props) => {

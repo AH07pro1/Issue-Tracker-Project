@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import IssueSummary from './issueSummary';
 import IssueBarChart from './issueBarChart';
 import LatestIssues from './latestIssues';
-import { useSession } from 'next-auth/react';
 
 interface Issue {
   id: number;

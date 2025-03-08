@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ const createIssueSchema = z.object({
 const NewIssue = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [assignedToUserId, setAssignedToUserId] = useState<string | null>(null); // Store selected user ID
-    const { status, data: session } = useSession();
+    const {data: session } = useSession();
 
 
     //  useEffect(() => {

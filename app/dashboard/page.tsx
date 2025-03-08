@@ -27,7 +27,9 @@ const Page = () => {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const response = await fetch('/api/issues',
+        const response = await fetch('/api/issues',{headers: {
+          "Accept": "application/json",
+        }}
           
         );
         const data: Issue[] = await response.json();

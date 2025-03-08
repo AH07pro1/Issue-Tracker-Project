@@ -49,6 +49,7 @@ const NewIssue = () => {
         console.log("session name:" + session?.user.name)
         console.log("session image:" + session?.user.image)
         console.log("session id:" + session?.user.id)
+        console.log("session role:" + session?.user.role)
         console.log("Submitting issue:", data);
         setIsLoading(true);
 

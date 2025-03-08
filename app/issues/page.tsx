@@ -24,13 +24,17 @@ const IssuePage = () => {
   const { setIssueCounts } = useAppContext();
   const { data: session } = useSession();
 
-  useEffect(() => {
-    if (!session) {
-      redirect('/api/auth/signin');
-    } else {
-      getUserIssues();
-    }
-  }, [session, sortOrder, filteredStatus, filterType]);
+  // useEffect(() => {
+  //   if (!session) {
+  //     redirect('/api/auth/signin');
+  //   } else {
+  //     getUserIssues();
+  //   }
+  // }, [session, sortOrder, filteredStatus, filterType]);
+
+  useEffect(() =>{
+      getUserIssues()
+  })
 
   const getCurrentFilter = () => {
     return `${filterType === 'all' ? 'All' : filterType === 'created' ? 'Created by Me' : 'Assigned to Me'}${filteredStatus ? ` (${filteredStatus})` : ''}`;
@@ -40,9 +44,7 @@ const IssuePage = () => {
     try {
       const response = await fetch('/api/issues');
       let data: Issue[] = await response.json();
-
       if (!session?.user?.id) return;
-
       // Default: Show issues created by or assigned to the user
       data = data.filter(
         (issue) =>

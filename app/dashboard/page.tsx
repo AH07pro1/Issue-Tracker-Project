@@ -19,11 +19,11 @@ interface Issue {
 const Page = () => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const {status, data: session} = useSession();
- useEffect(() => {
-        if (!session) {
-          redirect('/api/auth/signin');
-        } 
-      }, [session]);
+//  useEffect(() => {
+//         if (!session) {
+//           redirect('/api/auth/signin');
+//         } 
+//       }, [session]);
   useEffect(() => {
     const fetchIssues = async () => {
       try {

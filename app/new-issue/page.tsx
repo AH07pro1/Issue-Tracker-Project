@@ -22,11 +22,12 @@ const NewIssue = () => {
     const [assignedToUserId, setAssignedToUserId] = useState<string | null>(null); // Store selected user ID
     const { status, data: session } = useSession();
 
-     useEffect(() => {
-        if (!session) {
-          redirect('/api/auth/signin');
-        } 
-      }, [session]);
+
+    //  useEffect(() => {
+    //     if (!session) {
+    //       redirect('/api/auth/signin');
+    //     } 
+    //   }, [session]);
   
     const {
         register,
@@ -44,6 +45,10 @@ const NewIssue = () => {
     };
 
     const onSubmit = async (data: any) => {
+        console.log("session email:" + session?.user.email)
+        console.log("session name:" + session?.user.name)
+        console.log("session image:" + session?.user.image)
+        console.log("session id:" + session?.user.id)
         console.log("Submitting issue:", data);
         setIsLoading(true);
 

@@ -22,13 +22,12 @@ const handler = NextAuth({
     async session({ session, user }) {
       if (user) {
         session.user.id = user.id;
-
       }
       return session;
     },
   },
   session: {
-    strategy: "jwt",
+    strategy: "database", // fixed the problem of the session's user id not being accessible
   },
 });
 

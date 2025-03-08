@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import React from 'react'
 import ProfileTemplate from './profileTemplate';
 
-const page = () => {
+const Page = () => {
     const {data: session } = useSession();
   return (
     <div>
@@ -12,4 +12,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

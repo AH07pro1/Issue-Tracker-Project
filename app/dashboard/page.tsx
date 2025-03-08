@@ -27,7 +27,9 @@ const Page = () => {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const response = await fetch('/api/issues');
+        const response = await fetch('/api/issues',
+          
+        );
         const data: Issue[] = await response.json();
         setIssues(data);
       } catch (error) {

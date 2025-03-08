@@ -1,13 +1,14 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
-export const authOptions: AuthOptions = {
+const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -20,11 +21,10 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    // Type the session and user parameters here using the custom type from next-auth.d.ts
     async session({ session, user }) {
       if (user) {
         session.user.id = user.id;
-        session.user.role = ((user as unknown) as { role: string }).role || "user"; // Ensure role exists
+        session.user.role = ((user as unknown) as { role: string }).role || "user";
       }
       return session;
     },
@@ -34,5 +34,7 @@ export const authOptions: AuthOptions = {
   },
 };
 
-export const GET = NextAuth(authOptions);
-export const POST = NextAuth(authOptions);
+// Properly export handlers for the App Router
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

@@ -4,7 +4,6 @@ import IssueSummary from './issueSummary';
 import IssueBarChart from './issueBarChart';
 import LatestIssues from './latestIssues';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 
 interface Issue {
   id: number;
@@ -18,12 +17,7 @@ interface Issue {
 
 const Page = () => {
   const [issues, setIssues] = useState<Issue[]>([]);
-  const {status, data: session} = useSession();
-//  useEffect(() => {
-//         if (!session) {
-//           redirect('/api/auth/signin');
-//         } 
-//       }, [session]);
+
   useEffect(() => {
     const fetchIssues = async () => {
       try {

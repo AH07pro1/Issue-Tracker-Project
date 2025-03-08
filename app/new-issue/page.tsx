@@ -4,9 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-import SelectStatusDropdown from './selectStatusDropdown';
-import AssigneeDropdown from '../assigneeDropdown';
-import { useAppContext } from '@/context';
 import { useSession } from 'next-auth/react';
 import IssueForm from './IssueForm';
 

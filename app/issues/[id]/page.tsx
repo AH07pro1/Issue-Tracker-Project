@@ -3,7 +3,6 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@/app/Modal';
 import AssigneeDropdown from '../../assigneeDropdown';
-import { boolean } from 'zod';
 
 interface Props {
     params: Promise<{ id: number }>; // `params` is now a Promise

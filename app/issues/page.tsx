@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useAppContext } from '@/context';
-import { redirect } from 'next/navigation';
 import IssueTable from './issueTable';
 
 interface Issue {

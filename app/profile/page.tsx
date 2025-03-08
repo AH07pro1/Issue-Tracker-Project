@@ -4,7 +4,7 @@ import React from 'react'
 import ProfileTemplate from './profileTemplate';
 
 const page = () => {
-    const { status, data: session } = useSession();
+    const {data: session } = useSession();
   return (
     <div>
       <ProfileTemplate name={session!.user!.name!} email={session!.user!.email!} profilePic={session!.user!.image!}/>

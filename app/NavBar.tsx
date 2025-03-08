@@ -3,7 +3,6 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, usePathname } from 'next/navigation';
 import React from 'react';
-import Image from 'next/image';
 
 const NavBar = () => {
     const currentPath = usePathname();

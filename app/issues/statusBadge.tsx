@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 interface Props {
     status: string
 }
-function statusBadge({status}: Props) {
+function StatusBadge({status}: Props) {
     const [badgeStyle, setBadgeStyle] = useState('')   
     const getBadgeStyle = (status: string) => {
         if(status === 'OPEN') return 'badge badge-success'
@@ -25,4 +25,4 @@ function statusBadge({status}: Props) {
   )
 }
 
-export default statusBadge
+export default StatusBadge

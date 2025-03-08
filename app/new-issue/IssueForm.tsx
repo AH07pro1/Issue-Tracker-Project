@@ -1,5 +1,5 @@
 import React from 'react';
-import { FieldValues, UseFormRegister, FieldErrors } from 'react-hook-form';
+import {UseFormRegister, FieldErrors } from 'react-hook-form';
 import SelectStatusDropdown from './selectStatusDropdown';
 import AssigneeDropdown from '../assigneeDropdown';
 
@@ -24,7 +24,7 @@ const IssueForm: React.FC<IssueFormProps> = ({
   errors,
   isLoading,
   onSubmit,
-  assignedToUserId,
+  // assignedToUserId,
   setAssignedToUserId,
 }) => (
   <div className="max-w-lg mx-auto p-6 bg-base-100 shadow-lg rounded-lg">

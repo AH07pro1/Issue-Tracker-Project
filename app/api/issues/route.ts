@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import schema from "./createIssueSchema";
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest){
+export async function GET(){
   const issues = await prisma.issue.findMany();
   return NextResponse.json(issues);
 }

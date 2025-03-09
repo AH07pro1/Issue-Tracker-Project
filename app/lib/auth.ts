@@ -32,4 +32,5 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "database",
   },
+  secret: process.env.JWT_SECRET,
 };

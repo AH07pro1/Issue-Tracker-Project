@@ -3,15 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    console.log("Received ID:", params.id);
+interface Context {
+  params: Promise<{ id: string }>;
+}
 
-    if (!params.id) {
+export async function GET(_req: NextRequest, context: Context) {
+    const { id } = await context.params;
+
+    console.log("Received ID:", id);
+
+    if (!id) {
         return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
     }
 
     const specificUser = await prisma.user.findUnique({
-        where: { id: params.id },
+        where: { id },
     });
 
     console.log("Found user:", specificUser);
@@ -22,5 +28,3 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
     return NextResponse.json(specificUser, { status: 200 });
 }
-
-

@@ -5,11 +5,11 @@ import schema from "../createIssueSchema";
 const prisma = new PrismaClient();
 
 interface Context {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(_req: NextRequest, context: Context) {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     const issue = await prisma.issue.findUnique({
         where: { id: parseInt(id) },

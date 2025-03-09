@@ -7,7 +7,7 @@ const Page = () => {
     const {data: session } = useSession();
   return (
     <div>
-      <ProfileTemplate name={session!.user!.name!} email={session!.user!.email!} profilePic={session!.user!.image!}/>
+      <ProfileTemplate name={session!.user.name!} email={session!.user.email!} profilePic={session!.user.image!}/>
     </div>
   )
 }

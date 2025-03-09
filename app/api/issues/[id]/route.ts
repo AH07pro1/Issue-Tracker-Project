@@ -4,15 +4,15 @@ import schema from "../createIssueSchema";
 
 const prisma = new PrismaClient();
 
-export async function GET({ params }: { params: Promise<{ id: string }>}) {
-    const { id } = await params;
+export async function GET(_req:NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
 
-    const issue = await prisma.issue.findUnique({
-        where: { id: parseInt(id) },
-    });
-    return NextResponse.json(issue, { status: 200 });
+  const issue = await prisma.issue.findUnique({
+      where: { id: parseInt(id) },
+  });
+
+  return NextResponse.json(issue, { status: 200 });
 }
-
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const body = await request.json();

@@ -4,7 +4,7 @@ import schema from "../createIssueSchema";
 
 const prisma = new PrismaClient();
 
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET({ params }: { params: Promise<{ id: string }>}) {
     const { id } = await params;
 
     const issue = await prisma.issue.findUnique({
